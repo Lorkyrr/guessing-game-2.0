@@ -23,11 +23,11 @@ def guess_the_number():
         else:
             print("Your guess is too high. Try again!")
     
-    # Reduz o número de tentativas
+    # Reduces the number of attempts
         tries -= 1
 
     else:
         print(f"\nUnfortunately, you're out of attempts! The secret number was {secret_number}.")
 
-# Inicia o jogo
+# Start the game
 guess_the_number()
