@@ -10,7 +10,14 @@ def guess_the_number():
     # Loop that continues while there are still attempts left
     while tries > 0:
         print(f"\nYou have {tries} attempts remaining.")
-        prediction = int(input("Enter your guess: "))
+        prediction = (input("Enter your guess: "))
+
+        # Validates if the input is an integer
+        try:
+            prediction = int(prediction)
+        except ValueError:
+            print("Invalid input! Please enter a valid integer.")
+            continue
 
     # Verifies if the guess is correct, too low, or too high
         if prediction == secret_number:
