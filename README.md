@@ -28,13 +28,15 @@ To run this game on your machine, you need:
 
 >**1° -->** The game automatically generates a secret number between 1 and 100.
 >
->**2° -->** You have a total of 10 attempts to guess it correctly.
+>**2° -->** You need to chose a difficulty level.
 >
->**3° -->** After each guess, the game provides feedback: 
+>**3° -->** Based on your choice, the game will give you a certain number of attempts to start guessing.
+>
+>**4° -->** After each guess, the game provides feedback: 
 > - Too low: Your guess is smaller than the secret number.
 > - Too high: Your guess is larger than the secret number.
 >
->**4° -->** Guess correctly before running out of attempts to win!
+>**5° -->** Guess correctly before running out of attempts to win!
 >
 >
 ---
