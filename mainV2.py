@@ -1,91 +1,100 @@
 import random
 
-class Config:
-    def __init__(self, nome, nivel, tentativas):
-        self.nome = nome
-        self.nivel = nivel
-        self.tentativas = tentativas
 
-print("\nWelcome to the Guessing Game!")
-while True:
+class GuessingGame:
 
-    nomeInput = input("Digite seu nome: ")
+    DIFFICULTIES = {
+        1: ("Fácil", 15),
+        2: ("Médio", 10),
+        3: ("Difícil", 5),
+        4: ("Impossível", 3),
+    }
 
-    nivelInput = int(input("Escolha o seu nivel de nivel " \
-    "\n1 - Fácil (15 tentativas) " \
-    "\n2 - Médio (10 tentativas) " \
-    "\n3 - Difícil (5 tentativas) " \
-    "\n4 - Impossível (3 tentativas) " \
-    "\n\nPressione Enter para continuar..."))
+    def __init__(self, player_name: str, difficulty_choice: int):
+        self.player_name = player_name.strip().capitalize()
+        self.difficulty_name, self.tries = self.DIFFICULTIES.get(
+            difficulty_choice, ("Médio", 10)
+        )
+        self.secret_number = random.randint(1, 100)
+        self.lower_limit = 1
+        self.upper_limit = 100
+        self.previous_guesses = []
 
-    if nivelInput !=    int(1) and nivelInput != int(2) and nivelInput != int(3) and nivelInput != int(4):
-        print("\nOpção inválida! Por favor, selecione um nível de nivel válido.")
-        continue
+    def make_guess(self, guess: int) -> str:
+        """Processa a tentativa do jogador e atualiza os limites dinâmicos."""
+        if guess in self.previous_guesses:
+            return "DUPLICATE"
 
-    else:
-        break
+        self.previous_guesses.append(guess)
+        self.tries -= 1
 
-def get_tentativas(nivel):
-    if nivel == 1:
-        return 15
-    elif nivel == 2:
-        return 10
-    elif nivel == 3:
-        return 5
-    elif nivel == 4:
-        return 3
-
-
-nivel = nivelInput
-nome = nomeInput.capitalize().strip()
-tentativas = get_tentativas(nivel)
+        if guess == self.secret_number:
+            return "WIN"
+        elif guess < self.secret_number:
+            self.lower_limit = max(self.lower_limit, guess + 1)
+            return "LOW"
+        else:
+            self.upper_bound = min(self.upper_limit, guess - 1)
+            return "HIGH"
 
 
-while True:
-    secret_number = random.randint(1, 100)
-    tries = tentativas
-    previous_guesses = []
-    lower_limit = 1
-    upper_limit = 100
+def run_game():
+    print("=== Welcome to the Guessing Game! ===")
+    name = input("Digite seu nome: ")
 
-    print(f"\nBem-vindo ao jogo de adivinhação, {nome}! Adivinhe o número secreto de 1 a 100. Você tem {tries} tentativas!")
+    print(
+        "\nEscolha o nível de dificuldade:\n"
+        "1 - Fácil (15 tentativas)\n"
+        "2 - Médio (10 tentativas)\n"
+        "3 - Difícil (5 tentativas)\n"
+        "4 - Impossível (3 tentativas)"
+    )
 
-    while tries > 0:
-        print(f"\nVocê tem {tries} tentativas restantes.")
+    while True:
+        try:
+            level = int(input("\nOpção (1-4): "))
+            if level in [1, 2, 3, 4]:
+                break
+            print("Por favor, selecione uma opção entre 1 e 4.")
+        except ValueError:
+            print("Entrada inválida! Digite apenas números.")
 
-        if previous_guesses:
-            print(f"Palpites anteriores: {previous_guesses}")
-            print(f"Intervalo atual: {lower_limit} a {upper_limit}")
+    # Instancia a classe com o estado do jogo
+    game = GuessingGame(name, level)
 
-        prediction = input("\nDigite seu palpite: ")
+    print(
+        f"\nBem-vindo, {game.player_name}! Você escolheu a dificuldade {game.difficulty_name} ({game.tries} tentativas)."
+    )
+
+    while game.tries > 0:
+        print(
+            f"\nTentativas restantes: {game.tries} | Intervalo: {game.lower_limit} a {game.upper_limit}"
+        )
+        if game.previous_guesses:
+            print(f"Palpites anteriores: {game.previous_guesses}")
 
         try:
-            prediction = int(prediction)
+            guess = int(input("Digite seu palpite: "))
         except ValueError:
-            print("\nEntrada inválida! Por favor, digite um número inteiro.")
+            print("Por favor, digite um número inteiro válido.")
             continue
 
-        if prediction < lower_limit or prediction > upper_limit:
-            print(f"\nPalpite fora do intervalo! Por favor, digite um número entre {lower_limit} e {upper_limit}.")
-            continue
+        result = game.make_guess(guess)
 
-        previous_guesses.append(prediction)
-
-        if prediction < secret_number:
+        if result == "DUPLICATE":
+            print("Você já tentou esse número! Tente outro sem perder tentativa.")
+        elif result == "WIN":
+            print(
+                f"\nParabéns, {game.player_name}! Você acertou o número {game.secret_number}!"
+            )
+            return
+        elif result == "LOW":
             print("Muito baixo!")
-            lower_limit = max(lower_limit, prediction + 1)
-        elif prediction > secret_number:
+        elif result == "HIGH":
             print("Muito alto!")
-            upper_limit = min(upper_limit, prediction - 1)
-        else:
-            print(f"\nParabéns, {nome}! Você acertou o número secreto {secret_number}!")
-            replay = input("\nQuer tentar a sorte mais uma vez? Pressione 1 para jogar novamente ou qualquer outra tecla para sair: ")
-            if replay == "1":
-                break
-            else:
-                exit()
 
-        tries -= 1
+    print(f"\nSuas tentativas acabaram! O número secreto era {game.secret_number}.")
 
-    if tries == 0:
-        print(f"\nSuas tentativas acabaram! O número secreto era {secret_number}.")
+
+if __name__ == "__main__":
+    run_game()
